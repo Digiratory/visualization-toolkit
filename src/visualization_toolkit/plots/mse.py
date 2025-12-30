@@ -1,6 +1,7 @@
 """MSE plotting"""
 
 import matplotlib.pyplot as plt
+
 from ..core.aggregation import aggregate
 
 
