@@ -1,16 +1,47 @@
 """Statistics Aggregation"""
+
 import numpy as np
 import pandas as pd
+
 
 def aggregate(
     data: pd.DataFrame, x: str, y: str, estimator: str = "mean", errorbar=("p", (5, 95))
 ):
     """
-    Aggregate values of a metric column grouped by unique values of another column.
+    Aggregate a metric grouped by values of another column.
 
     For each unique value in column `x`, the function computes a central tendency
-    estimate of column `y` (currently only the mean is supported) and asymmetric
-    error bars based on percentiles.
+    estimate of column `y` and corresponding asymmetric error bars.
+
+    Currently supported:
+        - estimator: "mean"
+        - errorbar: ("p", (low, high)) for percentile-based error bars
+
+    Parameters:
+        data (pd.DataFrame):
+            Input DataFrame containing at least columns `x` and `y`.
+
+        x (str):
+            Name of the column used for grouping.
+
+        y (str):
+            Name of the metric column to aggregate.
+
+        estimator (str, default="mean"):
+            Aggregation method for the central value.
+            Currently only "mean" is supported.
+
+        errorbar (tuple, default=("p", (5, 95))):
+            Error bar specification.
+            The first element defines the method:
+                - "p": percentile-based error bars
+            The second element is a tuple of two percentiles (low, high).
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]:
+            - metric_mean: array of aggregated metric values for each unique `x`
+            - metric_err: 2×N array of asymmetric errors
+              (lower_errors, upper_errors), suitable for plotting
     """
     x_list = data[x].unique()
     metric_mean_list = []
