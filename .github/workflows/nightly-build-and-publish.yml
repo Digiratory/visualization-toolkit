@@ -13,6 +13,8 @@ jobs:
   check-changes:
     name: Check for changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       has_changes: ${{ steps.check_changes.outputs.has_changes }}
     steps:
