@@ -6,7 +6,7 @@ description = ""
 license = "Apache-2.0"
 authors = [
     {name = "Aleksandr Sinitca",email = "siniza.s.94@gmail.com"},
-    {name = "Asya Lyanova", email = "ailianova@etu.ru"},
+    {name = "Asya Lyanova", email = "lyanova.ai@gmail.com"},
 ]
 readme = "README.md"
 requires-python = ">=3.10"
