@@ -1,0 +1,75 @@
+name: Nightly Build and Publish
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run at midnight UTC every day
+  workflow_dispatch:  # Allow manual triggering
+  push:
+    branches:
+      - main
+      - 'release/*'
+
+jobs:
+  check-changes:
+    name: Check for changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      has_changes: ${{ steps.check_changes.outputs.has_changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history to detect changes
+
+      - name: Check for changes in last 24 hours
+        id: check_changes
+        run: |
+          # Get current date and 24 hours ago
+          CURRENT_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          PAST_DATE=$(date -u -d "24 hours ago" +"%Y-%m-%dT%H:%M:%SZ")
+
+          # Check if there are any commits in the last 24 hours
+          COMMITS=$(git log --since="$PAST_DATE" --until="$CURRENT_DATE" --pretty=format:"%H" -- .)
+
+          if [ -z "$COMMITS" ]; then
+            echo "No changes detected in the last 24 hours"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected in the last 24 hours"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+  build-and-publish:
+    name: Build and Publish
+    needs: check-changes
+    if: needs.check-changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/visualization-toolkit
+    permissions:
+      id-token: write  # Required for Trusted Publisher
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel build setuptools-scm
+
+      - name: Build package
+        run: |
+          python -m build --wheel
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verbose: true
