@@ -1,0 +1,136 @@
+"Boxplot plotting"
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from visualization_toolkit.plots._broken_axis import _draw_axis_break
+
+
+def boxplot(
+    data: pd.DataFrame,
+    x: str,
+    y: str,
+    hue: str | None = None,
+    styles: dict = None,
+    broken: bool = False,
+    logy: bool = True,
+    bottom_ylim=None,
+    top_ylim=None,
+    xlabel: str = "С/Ш, дБ",
+    ylabel: str = "СКО",
+    title: str = "Зависимость СКО от уровня шума",
+    height_ratios=(1, 2),
+    axes_fontsize: int = 22,
+    title_fontsize: int = 24,
+    ax=None,
+):
+    """
+    Boxplot with optional broken Y axis.
+
+    Parameters:
+       data (pd.DataFrame): Input data containing experimental values.
+           Must include columns specified by `x` and `y`.
+        x (str): Name of the column used as the independent variable.
+    """
+
+    if broken:
+        if bottom_ylim is None or top_ylim is None:
+            raise ValueError("bottom_ylim and top_ylim required if broken=True")
+
+        fig, (ax_top, ax_bottom) = plt.subplots(
+            2,
+            1,
+            sharex=True,
+            figsize=(12, 8),
+            gridspec_kw={"height_ratios": height_ratios},
+        )
+        axes = (ax_top, ax_bottom)
+        ax_main = ax_bottom
+        _draw_axis_break(ax_top, ax_bottom)
+        ax_bottom.set_ylim(bottom_ylim)
+        ax_top.set_ylim(top_ylim)
+    else:
+        if ax is None:
+            fig, ax_main = plt.subplots(figsize=(12, 6))
+        else:
+            fig = ax.figure
+            ax_main = ax
+        axes = (ax_main,)
+
+    x_levels = data[x].unique()
+    x_levels.sort()
+
+    if hue is None:
+        hue_levels = [None]
+    else:
+        hue_levels = data[hue].unique()
+        hue_levels.sort()
+
+    n_groups = len(x_levels)
+    n_hue = len(hue_levels)
+    base_positions = np.arange(1, n_groups + 1)
+
+    for ax_ in axes:
+        plot_box_on_axis(
+            data,
+            x,
+            y,
+            hue,
+            hue_levels,
+            n_hue,
+            base_positions,
+            x_levels,
+            styles,
+            ax_,
+        )
+        if logy:
+            ax_.set_yscale("log")
+        ax_.grid(True)
+
+    ax_main.set_xticks(base_positions)
+    ax_main.set_xticklabels(x_levels)
+    ax_main.set_xlabel(xlabel, fontsize=axes_fontsize)
+    ax_main.set_ylabel(ylabel, fontsize=axes_fontsize)
+    if broken:
+        ax_top.set_title(title, fontsize=title_fontsize)
+    else:
+        ax_main.set_title(title, fontsize=title_fontsize)
+    return fig, axes if broken else ax_main
+
+
+def plot_box_on_axis(
+    data,
+    x: str,
+    y: str,
+    hue: str,
+    hue_levels,
+    n_hue,
+    base_positions,
+    x_levels,
+    styles,
+    ax,
+):
+    """
+    Plot a box on an axis.
+    """
+    width = 0.8 / max(1, n_hue)
+    for i, hue_val in enumerate(hue_levels):
+        offset = (i - (n_hue - 1) / 2) * width
+
+        for j, x_val in enumerate(x_levels):
+            mask = data[x] == x_val
+            if hue is not None:
+                mask &= data[hue] == hue_val
+
+            values = data.loc[mask, y].values
+            if len(values) == 0:
+                continue
+
+            ax.boxplot(
+                values,
+                positions=[base_positions[j] + offset],
+                widths=width * 0.9,
+                label=hue_val,
+                **styles.get(hue_val, {}),
+            )
