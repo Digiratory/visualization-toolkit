@@ -22,7 +22,7 @@ packages = [{include = "visualization_toolkit", from = "src"}]
 
 [build-system]
 requires = [
-    "poetry-core>=2.0.0,<3.0.0", 
+    "poetry-core>=2.0.0,<3.0.0",
     "setuptools>=80",
     "setuptools-scm>=8",
     "wheel"
