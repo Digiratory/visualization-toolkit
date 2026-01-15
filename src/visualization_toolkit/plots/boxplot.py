@@ -31,9 +31,30 @@ def boxplot(
     Boxplot with optional broken Y axis.
 
     Parameters:
-       data (pd.DataFrame): Input data containing experimental values.
-           Must include columns specified by `x` and `y`.
-        x (str): Name of the column used as the independent variable.
+        data (pd.DataFrame): Input data containing experimental values.
+                             Must include columns specified by x and y, and hue if used.
+        x (str): Column name used as the categorical X-axis.
+        y (str): Column name with values to plot as boxplots.
+        hue (str | None, optional): Column name for additional grouping within X categories.
+        styles (dict, optional): Dictionary of styles for different hue levels,
+                                 passed to ax.boxplot.
+        broken (bool, optional): If True, use a broken Y-axis with two subplots.
+        logy (bool, optional): If True, use a logarithmic scale for Y-axis.
+        bottom_ylim (tuple, optional): Y-axis limits for the bottom axis when broken=True.
+        top_ylim (tuple, optional): Y-axis limits for the top axis when broken=True.
+        xlabel (str, optional): Label for the X-axis. Default is "С/Ш, дБ".
+        ylabel (str, optional): Label for the Y-axis. Default is "СКО".
+        title (str, optional): Plot title. Default is "Зависимость СКО от уровня шума".
+        height_ratios (tuple, optional): Relative heights of top and bottom axes for broken=True.
+        axes_fontsize (int, optional): Font size for axis labels and ticks.
+        title_fontsize (int, optional): Font size for the title.
+        fig_size (tuple, optional): Figure size (width, height) in inches.
+        ax (matplotlib.axes.Axes, optional): Existing axes to plot on. Creates new figure if None.
+
+    Returns:
+        Tuple if broken=True, else single Axes.
+        fig (matplotlib.figure.Figure): Figure object containing the plot.
+        ax (matplotlib.axes.Axes or tuple of Axes): Axes object(s).
     """
     if styles is None:
         styles = {}
@@ -140,7 +161,19 @@ def plot_box_on_axis(
     ax,
 ):
     """
-    Plot a box on an axis.
+    Plot boxplots on a given axis.
+
+    Parameters
+        data (pd.DataFrame): Input data containing experimental values.
+        x (str): Column name used as the categorical X-axis.
+        y (str): Column name with values to plot as boxplots.
+        hue (str or None): Column name for additional grouping within X categories.
+        hue_levels (list): Unique values of the hue variable.
+        n_hue (int): Number of unique hue levels.
+        base_positions (array-like): Positions for each X category on the X-axis.
+        x_levels (array-like): Unique values of the X variable.
+        styles (dict): Dictionary of styles for each hue value, passed to ax.boxplot.
+        ax (matplotlib.axes.Axes): Axis object on which to draw the boxplots.
     """
     width = 0.8 / max(1, n_hue)
     for i, hue_val in enumerate(hue_levels):
