@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.patches import Patch
 
 from visualization_toolkit.plots._broken_axis import _draw_axis_break
 
@@ -12,7 +13,7 @@ def boxplot(
     x: str,
     y: str,
     hue: str | None = None,
-    styles: dict = {},
+    styles: dict = None,
     broken: bool = False,
     logy: bool = True,
     bottom_ylim=None,
@@ -21,8 +22,8 @@ def boxplot(
     ylabel: str = "СКО",
     title: str = "Зависимость СКО от уровня шума",
     height_ratios=(1, 2),
-    axes_fontsize: int = 22,
-    title_fontsize: int = 24,
+    axes_fontsize: int = 20,
+    title_fontsize: int = 22,
     fig_size: tuple = (12, 8),
     ax=None,
 ):
@@ -34,17 +35,20 @@ def boxplot(
            Must include columns specified by `x` and `y`.
         x (str): Name of the column used as the independent variable.
     """
-
+    if styles is None:
+        styles = {}
     if broken:
         if bottom_ylim is None or top_ylim is None:
             raise ValueError("bottom_ylim and top_ylim required if broken=True")
-
         fig, (ax_top, ax_bottom) = plt.subplots(
             2,
             1,
             sharex=True,
             figsize=fig_size,
-            gridspec_kw={"height_ratios": height_ratios},
+            gridspec_kw={
+                "height_ratios": height_ratios,
+                "hspace": 0.05,
+            },
         )
         axes = (ax_top, ax_bottom)
         ax_main = ax_bottom
@@ -88,6 +92,7 @@ def boxplot(
         if logy:
             ax_.set_yscale("log")
         ax_.grid(True)
+        ax_.tick_params(axis="both", labelsize=axes_fontsize - 4)
 
     ax_main.set_xticks(base_positions)
     ax_main.set_xticklabels(x_levels)
@@ -97,6 +102,28 @@ def boxplot(
         ax_top.set_title(title, fontsize=title_fontsize)
     else:
         ax_main.set_title(title, fontsize=title_fontsize)
+
+    if hue is not None and styles:
+        legend_handles = []
+
+        for hue_val in hue_levels:
+            style = styles.get(hue_val, {})
+
+            boxprops = style.get("boxprops", {})
+            patch = Patch(
+                facecolor=boxprops.get("facecolor", "none"),
+                edgecolor=boxprops.get("edgecolor", "black"),
+                hatch=boxprops.get("hatch", None),
+                label=str(hue_val),
+            )
+            legend_handles.append(patch)
+
+        fig.legend(
+            handles=legend_handles,
+            fontsize=axes_fontsize - 4,
+            loc="lower center",
+            ncol=n_hue,
+        )
     return fig, axes if broken else ax_main
 
 
@@ -132,6 +159,5 @@ def plot_box_on_axis(
                 values,
                 positions=[base_positions[j] + offset],
                 widths=width * 0.9,
-                label=hue_val,
                 **styles.get(hue_val, {}),
             )
