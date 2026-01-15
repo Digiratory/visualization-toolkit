@@ -12,7 +12,7 @@ def boxplot(
     x: str,
     y: str,
     hue: str | None = None,
-    styles: dict = None,
+    styles: dict = {},
     broken: bool = False,
     logy: bool = True,
     bottom_ylim=None,
@@ -23,6 +23,7 @@ def boxplot(
     height_ratios=(1, 2),
     axes_fontsize: int = 22,
     title_fontsize: int = 24,
+    fig_size: tuple = (12, 8),
     ax=None,
 ):
     """
@@ -42,7 +43,7 @@ def boxplot(
             2,
             1,
             sharex=True,
-            figsize=(12, 8),
+            figsize=fig_size,
             gridspec_kw={"height_ratios": height_ratios},
         )
         axes = (ax_top, ax_bottom)
@@ -52,7 +53,7 @@ def boxplot(
         ax_top.set_ylim(top_ylim)
     else:
         if ax is None:
-            fig, ax_main = plt.subplots(figsize=(12, 6))
+            fig, ax_main = plt.subplots(figsize=fig_size)
         else:
             fig = ax.figure
             ax_main = ax
