@@ -15,15 +15,16 @@ def mseplot(
     estimator: str = "mean",
     errorbar_type: str = "p",
     errorbar_data: tuple = (5, 95),
-    styles: dict = None,
+    styles: dict | None = None,
     logy: bool = True,
-    ylim: tuple = None,
-    xlabel: str = "С/Ш, дБ",
-    ylabel: str = "СКО",
+    y_lim: tuple | None = None,
+    x_label: str = "С/Ш, дБ",
+    y_label: str = "СКО",
     title: str = "Зависимость СКО от уровня шума",
     axes_fontsize: int = 22,
     title_fontsize: int = 24,
-    ax: matplotlib.axes.Axes = None,
+    ax: matplotlib.axes.Axes | None = None,
+    **kwargs,
 ):
     """
     Plot mean squared error (MSE) with error bars as a function of a noise-related variable.
@@ -59,11 +60,11 @@ def mseplot(
 
         logy(bool): If True, use a logarithmic scale for the y-axis.
 
-        ylim(tuple or None): Optional limits for the y-axis.
+        y_lim(tuple or None): Optional limits for the y-axis.
 
-        xlabel(str): Label for the x-axis.
+        x_label(str): Label for the x-axis.
 
-        ylabel(str): Label for the y-axis.
+        y_label(str): Label for the y-axis.
 
         title(str): Plot title.
 
@@ -99,16 +100,17 @@ def mseplot(
             capsize=5,
             linewidth=3,
             **style,
+            **kwargs,
         )
 
     if logy:
         plt.yscale("log")
-    if ylim:
-        ax.set_ylim(ylim)
-    if xlabel:
-        ax.set_xlabel(xlabel, fontsize=axes_fontsize)
-    if ylabel:
-        ax.set_ylabel(ylabel, fontsize=axes_fontsize)
+    if y_lim:
+        ax.set_ylim(y_lim)
+    if x_label:
+        ax.set_xlabel(x_label, fontsize=axes_fontsize)
+    if y_label:
+        ax.set_ylabel(y_label, fontsize=axes_fontsize)
     if title:
         ax.set_title(title, fontsize=title_fontsize)
     ax.legend(fontsize=axes_fontsize)
