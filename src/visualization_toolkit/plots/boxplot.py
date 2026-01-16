@@ -1,6 +1,6 @@
 "Boxplot plotting"
 
-from typing import Any
+from typing import Any, Sequence, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -17,10 +17,8 @@ def boxplot(
     y: str,
     hue: str | None = None,
     styles: dict = None,
-    broken: bool = False,
+    y_limits: Sequence[Tuple[float, float]] | None = None,
     logy: bool = True,
-    bottom_ylim=None,
-    top_ylim=None,
     xlabel: str = None,
     ylabel: str = None,
     title: str = None,
@@ -42,10 +40,8 @@ def boxplot(
         hue (str | None, optional): Column name for additional grouping within X categories.
         styles (dict, optional): Dictionary of styles for different hue levels,
                                  passed to ax.boxplot.
-        broken (bool, optional): If True, use a broken Y-axis with two subplots.
-        logy (bool, optional): If True, use a logarithmic scale for Y-axis.
-        bottom_ylim (tuple, optional): Y-axis limits for the bottom axis when broken=True.
-        top_ylim (tuple, optional): Y-axis limits for the top axis when broken=True.
+        y_limits (Sequence[Tuple[float, float]], optional): Y-axis limits for the boxplot. If one tuple is provided,
+                                 it will be used for one plots; two tuples for two plots with broken axis.
         xlabel (str, optional): Label for the X-axis.
         ylabel (str, optional): Label for the Y-axis.
         title (str, optional): Plot title.
@@ -60,9 +56,30 @@ def boxplot(
         fig (matplotlib.figure.Figure): Figure object containing the plot.
         ax (matplotlib.axes.Axes or tuple of Axes): Axes object(s).
     """
+
+    if y_limits is not None:
+        if not all(
+            isinstance(lim, (tuple, list)) and len(lim) == 2 for lim in y_limits
+        ):
+            raise ValueError(
+                "y_limits must be a sequence of (min, max) tuples, "
+                "e.g. y_limits=((1e-2, 1e-1),) or "
+                "y_limits=((1e-3, 1e-2), (1e1, 1e2))"
+            )
+
     if styles is None:
         styles = {}
-    if broken:
+    if y_limits is None or len(y_limits) < 2:
+        broken = False
+        if ax is None:
+            fig, ax_main = plt.subplots(figsize=fig_size)
+        else:
+            fig = ax.figure
+            ax_main = ax
+        axes = (ax_main,)
+    elif len(y_limits) == 2:
+        broken = True
+        bottom_ylim, top_ylim = y_limits
         if bottom_ylim is None or top_ylim is None:
             raise ValueError("bottom_ylim and top_ylim required if broken=True")
         fig, (ax_top, ax_bottom) = plt.subplots(
@@ -81,12 +98,7 @@ def boxplot(
         ax_bottom.set_ylim(bottom_ylim)
         ax_top.set_ylim(top_ylim)
     else:
-        if ax is None:
-            fig, ax_main = plt.subplots(figsize=fig_size)
-        else:
-            fig = ax.figure
-            ax_main = ax
-        axes = (ax_main,)
+        raise NotImplementedError("Only up to 2 y-limits are supported currently")
 
     x_levels = data[x].unique()
     x_levels.sort()
