@@ -1,7 +1,7 @@
 """Styles for the boxplot."""
 
 
-def boxprops_filled():
+def boxprops_filled_gray():
     """
     Return a dictionary of properties for filled box (style for printing).
 
@@ -22,7 +22,7 @@ def boxprops_filled():
     }
 
 
-def boxprops_empty():
+def boxprops_unfilled():
     """
     Return a dictionary of properties for empty box (style for printing).
 
@@ -43,7 +43,7 @@ def boxprops_empty():
     }
 
 
-def boxprops_hatched():
+def boxprops_filled_hatched():
     """
     Return a dictionary of properties for hatched box (style for printing).
 

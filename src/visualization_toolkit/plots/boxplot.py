@@ -16,17 +16,17 @@ def boxplot(
     x: str,
     y: str,
     hue: str | None = None,
-    styles: dict = None,
+    styles: dict | None = None,
     y_limits: Sequence[Tuple[float, float]] | None = None,
     logy: bool = True,
-    xlabel: str = None,
-    ylabel: str = None,
-    title: str = None,
+    x_label: str | None = None,
+    y_label: str | None = None,
+    title: str | None = None,
     height_ratios=(1, 2),
     axes_fontsize: int = 20,
     title_fontsize: int = 22,
     fig_size: tuple = (12, 8),
-    ax=None,
+    ax: matplotlib.axes.Axes | None = None,
     **kwargs,
 ):
     """
@@ -42,8 +42,8 @@ def boxplot(
                                  passed to ax.boxplot.
         y_limits (Sequence[Tuple[float, float]], optional): Y-axis limits for the boxplot. If one tuple is provided,
                                  it will be used for one plots; two tuples for two plots with broken axis.
-        xlabel (str, optional): Label for the X-axis.
-        ylabel (str, optional): Label for the Y-axis.
+        x_label (str, optional): Label for the X-axis.
+        y_label (str, optional): Label for the Y-axis.
         title (str, optional): Plot title.
         height_ratios (tuple, optional): Relative heights of top and bottom axes for broken=True.
         axes_fontsize (int, optional): Font size for axis labels and ticks.
@@ -134,10 +134,10 @@ def boxplot(
 
     ax_main.set_xticks(base_positions)
     ax_main.set_xticklabels(x_levels)
-    if xlabel is not None:
-        ax_main.set_xlabel(xlabel, fontsize=axes_fontsize)
-    if ylabel is not None:
-        ax_main.set_ylabel(ylabel, fontsize=axes_fontsize)
+    if x_label is not None:
+        ax_main.set_xlabel(x_label, fontsize=axes_fontsize)
+    if y_label is not None:
+        ax_main.set_ylabel(y_label, fontsize=axes_fontsize)
     if title is not None and broken:
         ax_top.set_title(title, fontsize=title_fontsize)
     elif title is not None:
