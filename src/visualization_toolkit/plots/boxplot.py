@@ -21,9 +21,9 @@ def boxplot(
     logy: bool = True,
     bottom_ylim=None,
     top_ylim=None,
-    xlabel: str = "С/Ш, дБ",
-    ylabel: str = "СКО",
-    title: str = "Зависимость СКО от уровня шума",
+    xlabel: str = None,
+    ylabel: str = None,
+    title: str = None,
     height_ratios=(1, 2),
     axes_fontsize: int = 20,
     title_fontsize: int = 22,
@@ -46,9 +46,9 @@ def boxplot(
         logy (bool, optional): If True, use a logarithmic scale for Y-axis.
         bottom_ylim (tuple, optional): Y-axis limits for the bottom axis when broken=True.
         top_ylim (tuple, optional): Y-axis limits for the top axis when broken=True.
-        xlabel (str, optional): Label for the X-axis. Default is "С/Ш, дБ".
-        ylabel (str, optional): Label for the Y-axis. Default is "СКО".
-        title (str, optional): Plot title. Default is "Зависимость СКО от уровня шума".
+        xlabel (str, optional): Label for the X-axis.
+        ylabel (str, optional): Label for the Y-axis.
+        title (str, optional): Plot title.
         height_ratios (tuple, optional): Relative heights of top and bottom axes for broken=True.
         axes_fontsize (int, optional): Font size for axis labels and ticks.
         title_fontsize (int, optional): Font size for the title.
@@ -112,8 +112,8 @@ def boxplot(
             base_positions,
             x_levels,
             styles,
-            ax=ax_,
-            kwargs=kwargs,
+            ax_,
+            **kwargs,
         )
         if logy:
             ax_.set_yscale("log")
@@ -122,11 +122,13 @@ def boxplot(
 
     ax_main.set_xticks(base_positions)
     ax_main.set_xticklabels(x_levels)
-    ax_main.set_xlabel(xlabel, fontsize=axes_fontsize)
-    ax_main.set_ylabel(ylabel, fontsize=axes_fontsize)
-    if broken:
+    if xlabel is not None:
+        ax_main.set_xlabel(xlabel, fontsize=axes_fontsize)
+    if ylabel is not None:
+        ax_main.set_ylabel(ylabel, fontsize=axes_fontsize)
+    if title is not None and broken:
         ax_top.set_title(title, fontsize=title_fontsize)
-    else:
+    elif title is not None:
         ax_main.set_title(title, fontsize=title_fontsize)
 
     if hue is not None and styles:
