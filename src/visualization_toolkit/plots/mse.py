@@ -24,6 +24,7 @@ def mseplot(
     axes_fontsize: int = 22,
     title_fontsize: int = 24,
     ax: matplotlib.axes.Axes = None,
+    **kwargs,
 ):
     """
     Plot mean squared error (MSE) with error bars as a function of a noise-related variable.
@@ -99,6 +100,7 @@ def mseplot(
             capsize=5,
             linewidth=3,
             **style,
+            **kwargs,
         )
 
     if logy:

@@ -1,5 +1,8 @@
 "Boxplot plotting"
 
+from typing import Any
+
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -26,6 +29,7 @@ def boxplot(
     title_fontsize: int = 22,
     fig_size: tuple = (12, 8),
     ax=None,
+    **kwargs,
 ):
     """
     Boxplot with optional broken Y axis.
@@ -108,7 +112,8 @@ def boxplot(
             base_positions,
             x_levels,
             styles,
-            ax_,
+            ax=ax_,
+            kwargs=kwargs,
         )
         if logy:
             ax_.set_yscale("log")
@@ -153,12 +158,13 @@ def plot_box_on_axis(
     x: str,
     y: str,
     hue: str,
-    hue_levels,
-    n_hue,
-    base_positions,
-    x_levels,
-    styles,
-    ax,
+    hue_levels: list,
+    n_hue: int,
+    base_positions: Any,
+    x_levels: Any,
+    styles: dict,
+    ax: matplotlib.axes.Axes,
+    **kwargs,
 ):
     """
     Plot boxplots on a given axis.
@@ -192,5 +198,6 @@ def plot_box_on_axis(
                 values,
                 positions=[base_positions[j] + offset],
                 widths=width * 0.9,
-                **styles.get(hue_val, {}),
+                **kwargs,
+                **(styles.get(hue_val, {}) if styles else {}),
             )
