@@ -49,7 +49,7 @@ def mse_experiment(
     n_ratios = len(hue_values)
     n_samples = len(original_signals) // n_ratios
     rows = []
-    for label, signal in signals.items():
+    for label, signals in signals.items():
         for i, hue_value in enumerate(hue_values):
             for run in range(n_samples):
                 idx = i * n_samples + run
@@ -58,7 +58,7 @@ def mse_experiment(
                         hue_name: hue_value,
                         "mse": mse(
                             original_signals[idx],
-                            signal[idx],
+                            signals[idx],
                         ),
                         "label": label,
                         "run": run,
