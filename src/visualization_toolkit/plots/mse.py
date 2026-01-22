@@ -97,8 +97,6 @@ def mseplot(
             mse_mean,
             yerr=mse_err,
             label=label,
-            capsize=5,
-            linewidth=3,
             **style,
             **kwargs,
         )
