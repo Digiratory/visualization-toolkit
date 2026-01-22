@@ -8,12 +8,12 @@ from ..metrics.mse import mse
 
 def mse_experiment(
     original_signals: np.ndarray,
-    signals: dict[str, np.ndarray],
+    malformed_signals: dict[str, np.ndarray],
     hue_values: list,
     hue_name: str,
 ) -> pd.DataFrame:
     """
-    Computes MSE between clean and reconstructed signals for different
+    Computes MSE between clean and malformed signals for different
     metrics and returns the results in a tidy DataFrame.
 
     The function assumes that signals are ordered such that for each hue value
@@ -30,7 +30,7 @@ def mse_experiment(
             Array of clean reference signals with shape
             (n_levels * n_samples, ...).
 
-        signals (dict[str, np.ndarray]):
+        malformed_signals (dict[str, np.ndarray]):
             Dictionary mapping signal labels to arrays of signals
             (e.g. noisy or reconstructed), each having the same shape
             and ordering as `original_signals`.
@@ -49,7 +49,7 @@ def mse_experiment(
     n_ratios = len(hue_values)
     n_samples = len(original_signals) // n_ratios
     rows = []
-    for label, signal in signals.items():
+    for label, signals in malformed_signals.items():
         for i, hue_value in enumerate(hue_values):
             for run in range(n_samples):
                 idx = i * n_samples + run
@@ -58,7 +58,7 @@ def mse_experiment(
                         hue_name: hue_value,
                         "mse": mse(
                             original_signals[idx],
-                            signal[idx],
+                            signals[idx],
                         ),
                         "label": label,
                         "run": run,
