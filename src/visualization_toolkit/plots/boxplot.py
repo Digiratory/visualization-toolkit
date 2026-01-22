@@ -77,6 +77,8 @@ def boxplot(
             fig = ax.figure
             ax_main = ax
         axes = (ax_main,)
+        if len(y_limits) == 1:
+            ax_main.set_ylim(y_limits[0])
     elif len(y_limits) == 2:
         broken = True
         bottom_ylim, top_ylim = y_limits
