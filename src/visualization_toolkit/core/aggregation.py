@@ -8,7 +8,7 @@ def aggregate(
     data: pd.DataFrame,
     x: str,
     y: str,
-    estimator: str = "median",
+    estimator: str = "mean",
     errorbar_type="p",
     errorbar_data=(5, 95),
 ):
@@ -33,7 +33,7 @@ def aggregate(
         y (str):
             Name of the metric column to aggregate.
 
-        estimator (str, default="median"):
+        estimator (str, default="mean"):
             Aggregation method for the central value.
             Currently "mean" or "median" are supported.
 
@@ -46,30 +46,37 @@ def aggregate(
 
     Returns:
         tuple[np.ndarray, np.ndarray]:
+            - x_list: array of unique `x` values
             - metric_list: array of aggregated metric values for each unique `x`
             - metric_err: 2×N array of asymmetric errors
               (lower_errors, upper_errors), suitable for plotting
     """
-    x_list = data[x].unique()
+    x_list = np.sort(data[x].unique())
     metric_list = []
     metric_err_list = []
+
     for x_value in x_list:
-        part_df = data[data[x] == x_value]
-        metric = part_df[y]
-        if estimator == "mean":
-            center = metric.mean()
-        elif estimator == "median":
-            center = metric.median()
+        metric = data.loc[data[x] == x_value, y].values
+
+        if estimator == "median":
+            center = np.percentile(metric, 50)
+        elif estimator == "mean":
+            center = np.mean(metric)
         else:
             raise NotImplementedError(estimator)
-        metric_list.append(center)
+
         if errorbar_type == "p":
-            p_low, p_high = np.percentile(metric, errorbar_data)
-            metric_err = (
-                center - p_low,
-                p_high - center,
-            )
+            p_low, p_high = errorbar_data
+            low = np.percentile(metric, p_low)
+            high = np.percentile(metric, p_high)
+
+            metric_err_list.append((center - low, high - center))
         else:
             raise NotImplementedError(errorbar_type)
-        metric_err_list.append(metric_err)
-    return np.array(metric_list), np.array(metric_err_list).T
+        metric_list.append(center)
+
+    return (
+        np.array(x_list),
+        np.array(metric_list),
+        np.array(metric_err_list).T,
+    )

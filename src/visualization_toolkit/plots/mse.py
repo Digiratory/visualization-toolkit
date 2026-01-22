@@ -9,9 +9,9 @@ from ..core.aggregation import aggregate
 
 def mseplot(
     data: pd.DataFrame,
-    x: str = "snr",
-    y: str = "mse",
-    hue: str = "label",
+    x: str,
+    y: str,
+    hue: str = None,
     estimator: str = "median",
     errorbar_type: str = "p",
     errorbar_data: tuple = (5, 95),
@@ -37,13 +37,13 @@ def mseplot(
         data(pandas.DataFrame): Input data containing experimental results.
             Must include columns specified by `x`, `y`, and `hue`.
 
-        x(str, default="snr"): Name of the column used as the independent variable
+        x(str): Name of the column used as the independent variable
             (e.g., noise level or signal-to-noise ratio).
 
-        y(str, default="mse"): Name of the column containing the error metric to be plotted
+        y(str): Name of the column containing the error metric to be plotted
             (e.g., mean squared error).
 
-        hue(str, default="label"): Name of the column used to group the data into separate curves
+        hue(str, default=None): Name of the column used to group the data into separate curves
             (e.g., different models or methods).
 
         estimator(str, default="median"): Aggregation function used to compute the central
@@ -81,25 +81,46 @@ def mseplot(
     if ax is None:
         _, ax = plt.subplots(figsize=(6, 6))
 
-    for label in data[hue].unique():
-        mse_mean, mse_err = aggregate(
-            data[(data[hue] == label)],
+    if hue is None:
+        x_list, mse_values, mse_err = aggregate(
+            data,
             x,
             y,
             estimator=estimator,
             errorbar_type=errorbar_type,
             errorbar_data=errorbar_data,
         )
-        style = styles.get(label, {}) if styles else {}
-
+        hue_value = list(styles.keys())[0]
+        style = styles.get(hue_value, {}) if styles else {}
         ax.errorbar(
-            data[x].unique(),
-            mse_mean,
+            x_list,
+            mse_values,
             yerr=mse_err,
-            label=label,
             **style,
             **kwargs,
         )
+
+    else:
+        for hue_value in data[hue].unique():
+            x_list, mse_values, mse_err = aggregate(
+                data[(data[hue] == hue_value)],
+                x,
+                y,
+                estimator=estimator,
+                errorbar_type=errorbar_type,
+                errorbar_data=errorbar_data,
+            )
+            style = styles.get(hue_value, {}) if styles else {}
+
+            ax.errorbar(
+                x_list,
+                mse_values,
+                yerr=mse_err,
+                label=hue_value,
+                **style,
+                **kwargs,
+            )
+        ax.legend(fontsize=axes_fontsize)
 
     if logy:
         plt.yscale("log")
@@ -111,6 +132,5 @@ def mseplot(
         ax.set_ylabel(y_label, fontsize=axes_fontsize)
     if title:
         ax.set_title(title, fontsize=title_fontsize)
-    ax.legend(fontsize=axes_fontsize)
     ax.grid(True)
     return ax
