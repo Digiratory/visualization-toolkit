@@ -35,7 +35,7 @@ def aggregate(
 
         estimator (str, default="median"):
             Aggregation method for the central value.
-            Currently "mean" ot "median" are supported.
+            Currently "mean" or "median" are supported.
 
         errorbar_type (str, default="p"):
             Error bar specification.
