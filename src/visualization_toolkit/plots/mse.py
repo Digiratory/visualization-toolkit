@@ -12,7 +12,7 @@ def mseplot(
     x: str = "snr",
     y: str = "mse",
     hue: str = "label",
-    estimator: str = "mean",
+    estimator: str = "median",
     errorbar_type: str = "p",
     errorbar_data: tuple = (5, 95),
     styles: dict | None = None,
@@ -37,30 +37,30 @@ def mseplot(
         data(pandas.DataFrame): Input data containing experimental results.
             Must include columns specified by `x`, `y`, and `hue`.
 
-        x(str): Name of the column used as the independent variable
+        x(str, default="snr"): Name of the column used as the independent variable
             (e.g., noise level or signal-to-noise ratio).
 
-        y(str): Name of the column containing the error metric to be plotted
+        y(str, default="mse"): Name of the column containing the error metric to be plotted
             (e.g., mean squared error).
 
-        hue(str): Name of the column used to group the data into separate curves
+        hue(str, default="label"): Name of the column used to group the data into separate curves
             (e.g., different models or methods).
 
-        estimator(str): Aggregation function used to compute the central
+        estimator(str, default="median"): Aggregation function used to compute the central
             tendency of `y` for each value of `x` (e.g., `"mean"`, `"median"`).
 
-        errorbar_type(str): Type of error bars to compute.
+        errorbar_type(str, default="p"): Type of error bars to compute.
             Passed to the `aggregate` function (e.g., `"p"` for percentiles).
 
-        errorbar_data(tuple): Parameters defining the error bars.
+        errorbar_data(tuple, default=(5, 95)): Parameters defining the error bars.
             For percentile-based intervals, specifies the lower and upper percentiles.
 
-        styles(dict or None): Optional mapping from group labels to Matplotlib style
+        styles(dict or None, default=None): Optional mapping from group labels to Matplotlib style
             dictionaries (e.g., line style, marker, color).
 
-        logy(bool): If True, use a logarithmic scale for the y-axis.
+        logy(bool, default=True): If True, use a logarithmic scale for the y-axis.
 
-        y_lim(tuple or None): Optional limits for the y-axis.
+        y_lim(tuple or None, default=None): Optional limits for the y-axis.
 
         x_label(str): Label for the x-axis.
 
@@ -68,11 +68,11 @@ def mseplot(
 
         title(str): Plot title.
 
-        axes_fontsize(int): Font size for axis labels and legend.
+        axes_fontsize(int, default=22): Font size for axis labels and legend.
 
-        title_fontsize(int): Font size for the plot title.
+        title_fontsize(int, default=24): Font size for the plot title.
 
-        ax(matplotlib.axes.Axes or None): Existing Matplotlib axes to draw on.
+        ax(matplotlib.axes.Axes or None, default=None): Existing Matplotlib axes to draw on.
             If None, a new figure and axes are created.
 
     Returns:
