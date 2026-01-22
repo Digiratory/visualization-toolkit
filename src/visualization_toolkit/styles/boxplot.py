@@ -6,7 +6,7 @@ def boxprops_filled(facecolor: str = "lightgray"):
     Return a dictionary of properties for filled box (style for printing).
 
     Parameters:
-      facecolor (str): The color of the filled box. Default is "white".
+      facecolor (str): The color of the filled box. Default is "lightgray".
 
     Returns:
        dict: A dictionary containing the properties.
