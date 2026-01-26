@@ -10,6 +10,7 @@ from visualization_toolkit.plots._boxplot_utils import (
     add_legend,
     create_axes,
     get_x_levels,
+    is_broken,
 )
 from visualization_toolkit.plots._significance_boxplot import add_significance
 
@@ -73,6 +74,11 @@ def boxplot(
 
     if styles is None:
         styles = {}
+    if (significance_fn is not None) and (is_broken(y_limits)):
+        raise NotImplementedError(
+            "Significance levels are not supported with broken axis"
+        )
+
     fig, axes = create_axes(
         y_limits=y_limits, height_ratios=height_ratios, fig_size=fig_size, ax=ax
     )
