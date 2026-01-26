@@ -26,6 +26,10 @@ def _base_boxprops(facecolor: str, hatch: str | None = None):
         "whiskerprops": {"color": "black", "linestyle": "--", "linewidth": 2},
         "capprops": {"color": "black", "linewidth": 2},
         "boxprops": boxprops,
+        "medianprops": {"color": "black", "linewidth": 2.3},
+    }
+
+
 def boxprops_filled(facecolor: str = "lightgray"):
     """
     Return a dictionary of properties for filled box (style for printing).
@@ -37,10 +41,6 @@ def boxprops_filled(facecolor: str = "lightgray"):
        dict: A dictionary containing the properties.
     """
     return _base_boxprops(facecolor=facecolor)
-
-
-        "medianprops": {"color": "black", "linewidth": 2.3},
-    }
 
 
 def boxprops_filled_hatched(facecolor: str = "white", hatch: str = "//"):
