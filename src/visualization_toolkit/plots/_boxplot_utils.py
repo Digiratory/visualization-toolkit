@@ -129,7 +129,7 @@ def add_legend(
     )
 
 
-def _draw_axis_break(ax_top, ax_bottom, d=0.5):
+def _draw_axis_break(ax_top, ax_bottom, d=0.5, **kwargs):
     """
     Draw a broken axis between two axes.
 
@@ -137,11 +137,13 @@ def _draw_axis_break(ax_top, ax_bottom, d=0.5):
         ax_top(matplotlib.axes.Axes): The top axis.
         ax_bottom(matplotlib.axes.Axes): The bottom axis.
         d(float): The distance from the top axis to the bottom.
+        **kwargs: Additional keyword arguments to override default marker properties.
+                  Common options include: color, markersize, markeredgewidth (mew), etc.
 
     Returns:
-      None
+      None: Modifies the axes in-place by adding break markers.
     """
-    kwargs = {
+    default_kwargs = {
         "color": "k",
         "clip_on": False,
         "marker": [(-1, -d), (1, d)],
@@ -150,5 +152,6 @@ def _draw_axis_break(ax_top, ax_bottom, d=0.5):
         "mec": "k",
         "mew": 1,
     }
-    ax_top.plot([0, 1], [0, 0], transform=ax_top.transAxes, **kwargs)
-    ax_bottom.plot([0, 1], [1, 1], transform=ax_bottom.transAxes, **kwargs)
+    default_kwargs.update(kwargs)
+    ax_top.plot([0, 1], [0, 0], transform=ax_top.transAxes, **default_kwargs)
+    ax_bottom.plot([0, 1], [1, 1], transform=ax_bottom.transAxes, **default_kwargs)
