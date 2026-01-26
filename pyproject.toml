@@ -11,6 +11,14 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "matplotlib>=3.10",
+]
+
+[project.optional-dependencies]
+stats = [
+    "scipy>=1.9"
 ]
 
 [project.urls]
