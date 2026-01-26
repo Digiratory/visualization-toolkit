@@ -77,7 +77,6 @@ def create_axes(
             "hspace": 0.05,
         },
     )
-    ax_main = ax_bottom
     _draw_axis_break(ax_top, ax_bottom)
     ax_bottom.set_ylim(bottom_ylim)
     ax_top.set_ylim(top_ylim)
