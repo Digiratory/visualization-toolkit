@@ -1,14 +1,18 @@
 "Boxplot plotting"
 
-from typing import Any, Sequence, Tuple
+from typing import Any, Callable, Sequence, Tuple
 
 import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.patches import Patch
 
-from visualization_toolkit.plots._broken_axis import _draw_axis_break
+from visualization_toolkit.plots._boxplot_utils import (
+    add_legend,
+    create_axes,
+    get_x_levels,
+    is_broken,
+)
+from visualization_toolkit.plots._significance_boxplot import add_significance
 
 
 def boxplot(
@@ -18,6 +22,8 @@ def boxplot(
     hue: str | None = None,
     styles: dict | None = None,
     y_limits: Sequence[Tuple[float, float]] | None = None,
+    significance_fn: Callable | None = None,
+    significance_levels: dict[float, str] | None = None,
     logy: bool = True,
     x_label: str | None = None,
     y_label: str | None = None,
@@ -31,6 +37,14 @@ def boxplot(
 ):
     """
     Boxplot with optional broken Y axis.
+    Steps:
+    - validate_inputs
+    - create_axes
+    - compute_layout
+    - draw_boxes
+    - configure_axes
+    - draw_legend
+    - draw_significance
 
     Parameters:
         data (pd.DataFrame): Input data containing experimental values.
@@ -40,8 +54,9 @@ def boxplot(
         hue (str | None, optional): Column name for additional grouping within X categories.
         styles (dict, optional): Dictionary of styles for different hue levels,
                                  passed to ax.boxplot.
-        y_limits (Sequence[Tuple[float, float]], optional): Y-axis limits for the boxplot. If one tuple is provided,
-                                 it will be used for one plots; two tuples for two plots with broken axis.
+        y_limits (Sequence[Tuple[float, float]], optional): Y-axis limits for the boxplot.
+                            If one tuple is provided, it will be used for one plots;
+                            two tuples for two plots with broken axis.
         x_label (str, optional): Label for the X-axis.
         y_label (str, optional): Label for the Y-axis.
         title (str, optional): Plot title.
@@ -57,63 +72,21 @@ def boxplot(
         ax (matplotlib.axes.Axes or tuple of Axes): Axes object(s).
     """
 
-    if y_limits is not None:
-        if not all(
-            isinstance(lim, (tuple, list)) and len(lim) == 2 for lim in y_limits
-        ):
-            raise ValueError(
-                "y_limits must be a sequence of (min, max) tuples, "
-                "e.g. y_limits=((1e-2, 1e-1),) or "
-                "y_limits=((1e-3, 1e-2), (1e1, 1e2))"
-            )
-
     if styles is None:
         styles = {}
-    if y_limits is None or len(y_limits) < 2:
-        broken = False
-        if ax is None:
-            fig, ax_main = plt.subplots(figsize=fig_size)
-        else:
-            fig = ax.figure
-            ax_main = ax
-        axes = (ax_main,)
-        if len(y_limits) == 1:
-            ax_main.set_ylim(y_limits[0])
-    elif len(y_limits) == 2:
-        broken = True
-        bottom_ylim, top_ylim = y_limits
-        if bottom_ylim is None or top_ylim is None:
-            raise ValueError("bottom_ylim and top_ylim required if broken=True")
-        fig, (ax_top, ax_bottom) = plt.subplots(
-            2,
-            1,
-            sharex=True,
-            figsize=fig_size,
-            gridspec_kw={
-                "height_ratios": height_ratios,
-                "hspace": 0.05,
-            },
+    if (significance_fn is not None) and (is_broken(y_limits)):
+        raise NotImplementedError(
+            "Significance levels are not supported with broken axis"
         )
-        axes = (ax_top, ax_bottom)
-        ax_main = ax_bottom
-        _draw_axis_break(ax_top, ax_bottom)
-        ax_bottom.set_ylim(bottom_ylim)
-        ax_top.set_ylim(top_ylim)
-    else:
-        raise NotImplementedError("Only up to 2 y-limits are supported currently")
 
-    x_levels = data[x].unique()
-    x_levels.sort()
-
-    if hue is None:
-        hue_levels = [None]
-    else:
-        hue_levels = data[hue].unique()
-        hue_levels.sort()
-
-    n_groups = len(x_levels)
-    n_hue = len(hue_levels)
-    base_positions = np.arange(1, n_groups + 1)
+    fig, axes = create_axes(
+        y_limits=y_limits, height_ratios=height_ratios, fig_size=fig_size, ax=ax
+    )
+    ax_top = axes[0]
+    ax_main = axes[-1]
+    x_levels = get_x_levels(data, x)
+    hue_levels = get_x_levels(data, hue)
+    base_positions = np.arange(1, len(x_levels) + 1)
 
     for ax_ in axes:
         plot_box_on_axis(
@@ -122,7 +95,6 @@ def boxplot(
             y,
             hue,
             hue_levels,
-            n_hue,
             base_positions,
             x_levels,
             styles,
@@ -136,37 +108,29 @@ def boxplot(
 
     ax_main.set_xticks(base_positions)
     ax_main.set_xticklabels(x_levels)
-    if x_label is not None:
-        ax_main.set_xlabel(x_label, fontsize=axes_fontsize)
-    if y_label is not None:
-        ax_main.set_ylabel(y_label, fontsize=axes_fontsize)
-    if title is not None and broken:
-        ax_top.set_title(title, fontsize=title_fontsize)
-    elif title is not None:
-        ax_main.set_title(title, fontsize=title_fontsize)
+    ax_main.set_xlabel(x_label, fontsize=axes_fontsize)
+    ax_main.set_ylabel(y_label, fontsize=axes_fontsize)
+    ax_top.set_title(title, fontsize=title_fontsize)
 
-    if hue is not None and styles:
-        legend_handles = []
+    if hue is not None:
+        add_legend(fig, styles, hue_levels, axes_fontsize - 4)
 
-        for hue_val in hue_levels:
-            style = styles.get(hue_val, {})
+    if significance_fn is None:
+        return fig, axes
 
-            boxprops = style.get("boxprops", {})
-            patch = Patch(
-                facecolor=boxprops.get("facecolor", "none"),
-                edgecolor=boxprops.get("edgecolor", "black"),
-                hatch=boxprops.get("hatch", None),
-                label=str(hue_val),
-            )
-            legend_handles.append(patch)
-
-        fig.legend(
-            handles=legend_handles,
-            fontsize=axes_fontsize - 4,
-            loc="lower center",
-            ncol=n_hue,
-        )
-    return fig, axes if broken else ax_main
+    add_significance(
+        ax=ax_top,
+        data=data,
+        significance_fn=significance_fn,
+        x=x,
+        y=y,
+        hue=hue,
+        hue_levels=hue_levels,
+        x_levels=x_levels,
+        base_positions=base_positions,
+        levels=significance_levels,
+    )
+    return fig, axes
 
 
 def plot_box_on_axis(
@@ -175,7 +139,6 @@ def plot_box_on_axis(
     y: str,
     hue: str,
     hue_levels: list,
-    n_hue: int,
     base_positions: Any,
     x_levels: Any,
     styles: dict,
@@ -191,12 +154,12 @@ def plot_box_on_axis(
         y (str): Column name with values to plot as boxplots.
         hue (str or None): Column name for additional grouping within X categories.
         hue_levels (list): Unique values of the hue variable.
-        n_hue (int): Number of unique hue levels.
         base_positions (array-like): Positions for each X category on the X-axis.
         x_levels (array-like): Unique values of the X variable.
         styles (dict): Dictionary of styles for each hue value, passed to ax.boxplot.
         ax (matplotlib.axes.Axes): Axis object on which to draw the boxplots.
     """
+    n_hue = len(hue_levels)
     width = 0.8 / max(1, n_hue)
     for i, hue_val in enumerate(hue_levels):
         offset = (i - (n_hue - 1) / 2) * width
