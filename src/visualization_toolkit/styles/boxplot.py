@@ -1,6 +1,31 @@
 """Styles for the boxplot."""
 
 
+def _base_boxprops(facecolor: str, hatch: str | None = None):
+    """
+    Build the base dictionary of properties for boxplot styles.
+
+    Parameters:
+      facecolor (str): The color of the filled box.
+      hatch (str | None): Optional hatching pattern.
+
+    Returns:
+       dict: A dictionary containing the properties.
+    """
+    boxprops = {"facecolor": facecolor, "edgecolor": "black", "linewidth": 2}
+    if hatch is not None:
+        boxprops["hatch"] = hatch
+
+    return {
+        "patch_artist": True,
+        "flierprops": {
+            "markeredgecolor": "black",
+            "markeredgewidth": 1.5,
+            "markersize": 2,
+        },
+        "whiskerprops": {"color": "black", "linestyle": "--", "linewidth": 2},
+        "capprops": {"color": "black", "linewidth": 2},
+        "boxprops": boxprops,
 def boxprops_filled(facecolor: str = "lightgray"):
     """
     Return a dictionary of properties for filled box (style for printing).
@@ -11,16 +36,9 @@ def boxprops_filled(facecolor: str = "lightgray"):
     Returns:
        dict: A dictionary containing the properties.
     """
-    return {
-        "patch_artist": True,
-        "flierprops": {
-            "markeredgecolor": "black",
-            "markeredgewidth": 1.5,
-            "markersize": 2,
-        },
-        "whiskerprops": {"color": "black", "linestyle": "--", "linewidth": 2},
-        "capprops": {"color": "black", "linewidth": 2},
-        "boxprops": {"facecolor": facecolor, "edgecolor": "black", "linewidth": 2},
+    return _base_boxprops(facecolor=facecolor)
+
+
         "medianprops": {"color": "black", "linewidth": 2.3},
     }
 
@@ -36,20 +54,4 @@ def boxprops_filled_hatched(facecolor: str = "white", hatch: str = "//"):
     Returns:
        dict: A dictionary containing the properties.
     """
-    return {
-        "patch_artist": True,
-        "flierprops": {
-            "markeredgecolor": "black",
-            "markeredgewidth": 1.5,
-            "markersize": 2,
-        },
-        "whiskerprops": {"color": "black", "linestyle": "--", "linewidth": 2},
-        "capprops": {"color": "black", "linewidth": 2},
-        "boxprops": {
-            "facecolor": facecolor,
-            "edgecolor": "black",
-            "linewidth": 2,
-            "hatch": hatch,
-        },
-        "medianprops": {"color": "black", "linewidth": 2.3},
-    }
+    return _base_boxprops(facecolor=facecolor, hatch=hatch)
