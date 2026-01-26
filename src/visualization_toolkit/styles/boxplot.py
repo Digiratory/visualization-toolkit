@@ -21,7 +21,7 @@ def boxprops_filled(facecolor: str = "lightgray"):
         "whiskerprops": {"color": "black", "linestyle": "--", "linewidth": 2},
         "capprops": {"color": "black", "linewidth": 2},
         "boxprops": {"facecolor": facecolor, "edgecolor": "black", "linewidth": 2},
-        "medianprops": {"color": "black", "linewidth": 2.3},
+        "medianprops": {"color": "black", "linewidth": 2},
     }
 
 
@@ -51,5 +51,5 @@ def boxprops_filled_hatched(facecolor: str = "white", hatch: str = "//"):
             "linewidth": 2,
             "hatch": hatch,
         },
-        "medianprops": {"color": "black", "linewidth": 2.3},
+        "medianprops": {"color": "black", "linewidth": 2},
     }
