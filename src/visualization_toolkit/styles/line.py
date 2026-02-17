@@ -26,10 +26,18 @@ def _base_linestyle(
     """
     Base style factory for line plots.
 
-    This mirrors your boxplot style factories.
+    Args:
+        marker (str): Marker style for data points (e.g., "o", "s", "^").
+        linestyle (str): Line style for the plot (e.g., "-", "--").
+        markerfacecolor (str): Color used to fill the marker face. Use "none" for hollow markers.
+        markeredgecolor (str): Color of the marker edge.
+        markersize (int): Size of the markers.
+        linewidth (float): Width of the line.
+        color (str): Color of the line and, by default, marker edge.
 
     Returns:
-        dict: Style kwargs for plt.plot.
+        dict: Keyword arguments configuring marker and line appearance,
+        suitable for passing to ``matplotlib.pyplot.plot`` or similar APIs.
     """
     return {
         "marker": marker,
@@ -42,9 +50,18 @@ def _base_linestyle(
     }
 
 
-def line_empty_marker(marker="o", color=None, linestyle="-"):
+def line_empty_marker(marker="o", color="black", linestyle="-"):
     """
-    Line with empty markers and a solid black line.
+    Line style with empty markers and a solid line.
+
+    Args:
+        marker (str): Marker style for the points (e.g., "o", "s", "^").
+        color (str | None): Color for the line and marker edges. If ``None``,
+            the plotting library's default color is used.
+        linestyle (str): Line style string (e.g., "-", "--", ":").
+    Returns:
+        dict: Keyword arguments configuring marker and line appearance,
+        suitable for passing to ``matplotlib.pyplot.plot`` or similar APIs.
     """
     return _base_linestyle(
         marker=marker,
@@ -55,9 +72,18 @@ def line_empty_marker(marker="o", color=None, linestyle="-"):
     )
 
 
-def line_filled_marker(marker="o", color=None, facecolor=None, linestyle="-"):
+def line_filled_marker(marker="o", color="black", facecolor=None, linestyle="-"):
     """
     Line with filled markers.
+
+    Args:
+        marker (str, optional): Marker style for the data points (e.g. "o", "s").
+        color (str, optional): Color for the line and marker edges.
+        facecolor (str, optional): Fill color for the markers. If None, defaults to ``color``.
+        linestyle (str, optional): Line style for the plot (e.g. "-", "--").
+    Returns:
+        dict: Keyword arguments configuring marker and line appearance,
+        suitable for passing to ``matplotlib.pyplot.plot`` or similar APIs.
     """
     if facecolor is None:
         facecolor = color
