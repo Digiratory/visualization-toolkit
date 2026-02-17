@@ -1,7 +1,5 @@
 """Test languages from config."""
 
-import pytest
-
 from visualization_toolkit.localization import en, ru
 
 
