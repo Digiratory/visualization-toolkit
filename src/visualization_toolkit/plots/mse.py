@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from ..config import get_text
 from ..core.aggregation import aggregate
 
 
@@ -18,14 +19,14 @@ def mseplot(
     styles: dict | None = None,
     logy: bool = True,
     y_lim: tuple | None = None,
-    x_label: str = "С/Ш, дБ",
-    y_label: str = "СКО",
-    title: str = "Зависимость СКО от уровня шума",
+    x_label: str | None = None,
+    y_label: str | None = None,
+    title: str | None = None,
     axes_fontsize: int = 22,
     title_fontsize: int = 24,
     ax: matplotlib.axes.Axes | None = None,
     **kwargs,
-):
+) -> matplotlib.axes.Axes:
     """
     Plot mean squared error (MSE) with error bars as a function of a noise-related variable.
 
@@ -62,11 +63,20 @@ def mseplot(
 
         y_lim(tuple or None, default=None): Optional limits for the y-axis.
 
-        x_label(str): Label for the x-axis.
+        x_label(str): Label for the x-axis. Note:
+            If None: the localized default value is used.
+            If "": the label is not displayed.
+            If the str is: the specified label is used.
 
-        y_label(str): Label for the y-axis.
+        y_label(str): Label for the y-axis. Note:
+            If None: the localized default value is used.
+            If "": the label is not displayed.
+            If the str is: the specified label is used.
 
-        title(str): Plot title.
+        title(str): Plot title. Note:
+            If None: the localized default value is used.
+            If "": the title is not displayed.
+            If the str is: the specified title is used.
 
         axes_fontsize(int, default=22): Font size for axis labels and legend.
 
@@ -80,7 +90,12 @@ def mseplot(
     """
     if ax is None:
         _, ax = plt.subplots(figsize=(6, 6))
-
+    if x_label is None:
+        x_label = get_text("x_label_snr")
+    if y_label is None:
+        y_label = get_text("y_label_mse")
+    if title is None:
+        title = get_text("title_mse_vs_snr")
     if hue is None:
         x_list, mse_values, mse_err = aggregate(
             data,
@@ -126,11 +141,11 @@ def mseplot(
         plt.yscale("log")
     if y_lim:
         ax.set_ylim(y_lim)
-    if x_label:
+    if x_label != "":
         ax.set_xlabel(x_label, fontsize=axes_fontsize)
-    if y_label:
+    if y_label != "":
         ax.set_ylabel(y_label, fontsize=axes_fontsize)
-    if title:
+    if title != "":
         ax.set_title(title, fontsize=title_fontsize)
     ax.grid(True)
     return ax

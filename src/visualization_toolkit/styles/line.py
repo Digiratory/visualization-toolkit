@@ -26,7 +26,7 @@ def _base_linestyle(
     """
     Base style factory for line plots.
 
-    Args:
+    Parameters
         marker (str): Marker style for data points (e.g., "o", "s", "^").
         linestyle (str): Line style for the plot (e.g., "-", "--").
         markerfacecolor (str): Color used to fill the marker face. Use "none" for hollow markers.
@@ -50,11 +50,11 @@ def _base_linestyle(
     }
 
 
-def line_empty_marker(marker="o", color="black", linestyle="-"):
+def line_empty_marker(marker="o", color=None, linestyle="-"):
     """
     Line style with empty markers and a solid line.
 
-    Args:
+    Parameters
         marker (str): Marker style for the points (e.g., "o", "s", "^").
         color (str | None): Color for the line and marker edges. If ``None``,
             the plotting library's default color is used.
@@ -72,11 +72,11 @@ def line_empty_marker(marker="o", color="black", linestyle="-"):
     )
 
 
-def line_filled_marker(marker="o", color="black", facecolor=None, linestyle="-"):
+def line_filled_marker(marker="o", color=None, facecolor=None, linestyle="-"):
     """
     Line with filled markers.
 
-    Args:
+    Parameters
         marker (str, optional): Marker style for the data points (e.g. "o", "s").
         color (str, optional): Color for the line and marker edges.
         facecolor (str, optional): Fill color for the markers. If None, defaults to ``color``.
