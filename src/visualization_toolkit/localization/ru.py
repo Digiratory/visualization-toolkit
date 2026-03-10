@@ -4,6 +4,8 @@ TRANSLATIONS = {
     # Axis labels
     "x_label_snr": "С/Ш, дБ",
     "y_label_mse": "СКО",
+    "x_label_sample": "Отсчёт",
+    "y_label_amplitude": "Амплитуда",
     # Titles
     "title_mse_vs_snr": "Зависимость СКО от уровня шума",
     # Units
