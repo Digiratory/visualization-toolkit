@@ -95,19 +95,31 @@ def get_x_levels(data: pd.DataFrame, x: str) -> list:
 
 
 def add_legend(
-    fig: plt.Figure, styles: dict, hue_levels: list, fontsize: float
+    fig: plt.Figure,
+    ax: matplotlib.axes.Axes,
+    styles: dict,
+    hue_levels: list,
+    fontsize: float,
+    ncol: int | None = None,
+    bbox_to_anchor: tuple = (0.5, -0.15),
 ) -> None:
     """
-    Add a legend to the figure.
+    Add a legend to the figure below the x-axis label.
 
     Parameters:
         fig (plt.Figure): The figure to add legend.
+        ax (matplotlib.axes.Axes): The main (bottom) axes.
         styles (dict): A dictionary of styles for each hue level.
         hue_levels (list): A list of hue levels.
         fontsize (float): The font size for the legend.
+        ncol (int): The number of columns for the legend.
+            len(hue_levels) will be set by default.
+        bbox_to_anchor (tuple): Position of the legend anchor in axes coordinates.
+            Defaults to (0.5, -0.15).
     """
     legend_handles = []
-    n_hue = len(hue_levels)
+    if ncol is None:
+        ncol = len(hue_levels)
 
     for hue_val in hue_levels:
         style = styles.get(hue_val, {})
@@ -121,12 +133,14 @@ def add_legend(
         )
         legend_handles.append(patch)
 
-    fig.legend(
+    ax.legend(
         handles=legend_handles,
         fontsize=fontsize,
-        loc="lower center",
-        ncol=n_hue,
+        loc="upper center",
+        bbox_to_anchor=bbox_to_anchor,
+        ncol=ncol,
     )
+    fig.tight_layout()
 
 
 def _draw_axis_break(ax_top, ax_bottom, d=0.5, **kwargs):

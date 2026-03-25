@@ -33,6 +33,8 @@ def boxplot(
     title_fontsize: int = 22,
     fig_size: tuple = (12, 8),
     ax: matplotlib.axes.Axes | None = None,
+    legend_ncol: int | None = None,
+    legend_bbox_to_anchor: tuple = (0.5, -0.15),
     **kwargs,
 ):
     """
@@ -65,6 +67,10 @@ def boxplot(
         title_fontsize (int, optional): Font size for the title.
         fig_size (tuple, optional): Figure size (width, height) in inches.
         ax (matplotlib.axes.Axes, optional): Existing axes to plot on. Creates new figure if None.
+        legend_ncol (int): The number of columns for the legend.
+            len(hue_levels) will be set by default.
+        legend_bbox_to_anchor (tuple): Position of the legend anchor in axes coordinates.
+            Defaults to (0.5, -0.15).
 
     Returns:
         Tuple if broken=True, else single Axes.
@@ -113,7 +119,15 @@ def boxplot(
     ax_top.set_title(title, fontsize=title_fontsize)
 
     if hue is not None:
-        add_legend(fig, styles, hue_levels, axes_fontsize - 4)
+        add_legend(
+            fig,
+            ax_main,
+            styles,
+            hue_levels,
+            axes_fontsize - 4,
+            ncol=legend_ncol,
+            bbox_to_anchor=legend_bbox_to_anchor,
+        )
 
     if significance_fn is None:
         return fig, axes
