@@ -35,8 +35,8 @@ def boxplot(
     ax: matplotlib.axes.Axes | None = None,
     legend_ncol: int | None = None,
     legend_bbox_to_anchor: tuple = (0.5, -0.15),
-    show_median: bool = False,
-    show_mean: bool = False,
+    show_median_text: bool = False,
+    show_mean_text: bool = False,
     median_mean_fontsize: int | None = None,
     **kwargs,
 ):
@@ -74,12 +74,12 @@ def boxplot(
             len(hue_levels) will be set by default.
         legend_bbox_to_anchor (tuple): Position of the legend anchor in axes coordinates.
             Defaults to (0.5, -0.15).
-        show_median (bool, optional): If True, display the median value above each box.
+        show_median_text (bool, optional): If True, display the median value above each box.
             Defaults to False.
-        show_mean (bool, optional): If True, display the mean value above each box.
+        show_mean_text (bool, optional): If True, display the mean value above each box.
             Defaults to False.
         median_mean_fontsize (int, optional): Font size for the median/mean labels.
-            If both show_median and show_mean are True, the labels are stacked with
+            If both show_median_text and show_mean_text are True, the labels are stacked with
             median on top and mean below. Defaults to axes_fontsize - 6.
 
     Returns:
@@ -115,8 +115,8 @@ def boxplot(
             x_levels,
             styles,
             ax_,
-            show_median=show_median,
-            show_mean=show_mean,
+            show_median_text=show_median_text,
+            show_mean_text=show_mean_text,
             median_mean_fontsize=(
                 median_mean_fontsize
                 if median_mean_fontsize is not None
@@ -174,8 +174,8 @@ def plot_box_on_axis(
     x_levels: Any,
     styles: dict,
     ax: matplotlib.axes.Axes,
-    show_median: bool = False,
-    show_mean: bool = False,
+    show_median_text: bool = False,
+    show_mean_text: bool = False,
     median_mean_fontsize: int = 10,
     **kwargs,
 ):
@@ -192,9 +192,9 @@ def plot_box_on_axis(
         x_levels (array-like): Unique values of the X variable.
         styles (dict): Dictionary of styles for each hue value, passed to ax.boxplot.
         ax (matplotlib.axes.Axes): Axis object on which to draw the boxplots.
-        show_median (bool): If True, show the median value above the box.
-        show_mean (bool): If True, show the mean value above the box.
-            If both show_median and show_mean are True, labels are stacked:
+        show_median_text (bool): If True, show the median value above the box.
+        show_mean_text (bool): If True, show the mean value above the box.
+            If both show_median_text and show_mean_text are True, labels are stacked:
             median on top, mean below.
         median_mean_fontsize (int): Font size for the median/mean labels.
     """
@@ -221,11 +221,11 @@ def plot_box_on_axis(
                 **(styles.get(hue_val, {}) if styles else {}),
             )
 
-            if show_median or show_mean:
+            if show_median_text or show_mean_text:
                 q3 = np.percentile(values, 75)
-                if show_median and show_mean:
+                if show_median_text and show_mean_text:
                     label = f"{np.median(values):.3g}\n{np.mean(values):.3g}"
-                elif show_median:
+                elif show_median_text:
                     label = f"{np.median(values):.3g}"
                 else:
                     label = f"{np.mean(values):.3g}"
