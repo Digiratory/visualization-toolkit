@@ -28,7 +28,7 @@ def boxplot(
     x_label: str | None = None,
     y_label: str | None = None,
     title: str | None = None,
-    height_ratios=(1, 2),
+    height_ratios: Tuple = (1, 2),
     axes_fontsize: int = 20,
     title_fontsize: int = 22,
     fig_size: tuple = (12, 8),
@@ -59,13 +59,16 @@ def boxplot(
         hue (str | None, optional): Column name for additional grouping within X categories.
         styles (dict, optional): Dictionary of styles for different hue levels,
                                  passed to ax.boxplot.
-        y_limits (Sequence[Tuple[float, float]], optional): Y-axis limits for the boxplot.
-                            If one tuple is provided, it will be used for one plots;
-                            two tuples for two plots with broken axis.
+        y_limits (Sequence[Tuple[float, float]], optional): Y-axis limits ordered
+                            bottom-to-top. One tuple → single axis; two or more tuples →
+                            broken axis with one break per adjacent pair.
         x_label (str, optional): Label for the X-axis.
         y_label (str, optional): Label for the Y-axis.
         title (str, optional): Plot title.
-        height_ratios (tuple, optional): Relative heights of top and bottom axes for broken=True.
+        height_ratios (tuple, optional): Relative heights of the subplot panels,
+                            ordered top-to-bottom (matplotlib gridspec convention).
+                            Must have the same length as y_limits when a broken axis
+                            is used; otherwise equal ratios are applied.
         axes_fontsize (int, optional): Font size for axis labels and ticks.
         title_fontsize (int, optional): Font size for the title.
         fig_size (tuple, optional): Figure size (width, height) in inches.
@@ -83,9 +86,10 @@ def boxplot(
             median on top and mean below. Defaults to axes_fontsize - 6.
 
     Returns:
-        Tuple if broken=True, else single Axes.
         fig (matplotlib.figure.Figure): Figure object containing the plot.
-        ax (matplotlib.axes.Axes or tuple of Axes): Axes object(s).
+        axes (tuple[matplotlib.axes.Axes, ...]): Tuple of axes ordered top-to-bottom.
+            Contains one element when y_limits has fewer than two pairs,
+            and N elements when y_limits has N pairs (broken axis).
     """
 
     if styles is None:
@@ -137,7 +141,6 @@ def boxplot(
 
     if hue is not None:
         add_legend(
-            fig,
             ax_main,
             styles,
             hue_levels,
@@ -168,7 +171,7 @@ def plot_box_on_axis(
     data,
     x: str,
     y: str,
-    hue: str,
+    hue: str | None,
     hue_levels: list,
     base_positions: Any,
     x_levels: Any,
