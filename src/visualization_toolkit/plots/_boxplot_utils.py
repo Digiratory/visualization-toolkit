@@ -47,40 +47,56 @@ def create_axes(
     Create the axes for the boxplot.
 
     Parameters:
-        y_limits (Sequence): Sequence of (min, max) pairs.
-        height_ratios (tuple): Height ratios for the axes.
+        y_limits (Sequence): Sequence of (min, max) pairs ordered bottom-to-top.
+            One pair - single axis with that ylim.
+            Two or more pairs - broken axis with one break per adjacent pair.
+        height_ratios (tuple): Height ratios for the axes, ordered top-to-bottom
+            (matching matplotlib's gridspec convention). Must have the same length
+            as y_limits when a broken axis is used; otherwise equal ratios are used.
         fig_size (tuple): Size of the figure.
-        ax (matplotlib.axes.Axes | None): Ax to plot.
+        ax (matplotlib.axes.Axes | None): Ax to plot on. Ignored when a broken axis
+            is required (y_limits has two or more pairs).
     Returns:
-        fig, axes: Figure and axes.
+        fig, axes: Figure and tuple of axes ordered top-to-bottom.
     """
     check_y_limits(y_limits)
-    if y_limits is None or len(y_limits) < 2:
+    n = len(y_limits) if y_limits is not None else 0
+
+    if n < 2:
         if ax is None:
             fig, ax_main = plt.subplots(figsize=fig_size)
         else:
             fig = ax.figure
             ax_main = ax
-        if (y_limits is not None) and (len(y_limits) == 1):
+        if n == 1:
             ax_main.set_ylim(y_limits[0])
         return fig, (ax_main,)
-    bottom_ylim, top_ylim = y_limits
-    if bottom_ylim is None or top_ylim is None:
-        raise ValueError("bottom_ylim and top_ylim required if broken=True")
-    fig, (ax_top, ax_bottom) = plt.subplots(
-        2,
+
+    # n >= 2: create n subplots with n-1 breaks.
+    # y_limits is ordered bottom-to-top; axes from subplots are top-to-bottom,
+    # so axes[i] gets y_limits[n - 1 - i].
+    ratios = height_ratios if len(height_ratios) == n else [1] * n
+    fig, axes = plt.subplots(
+        n,
         1,
         sharex=True,
         figsize=fig_size,
-        gridspec_kw={
-            "height_ratios": height_ratios,
-            "hspace": 0.05,
-        },
+        layout="constrained",
+        gridspec_kw={"height_ratios": ratios},
     )
-    _draw_axis_break(ax_top, ax_bottom)
-    ax_bottom.set_ylim(bottom_ylim)
-    ax_top.set_ylim(top_ylim)
-    return fig, (ax_top, ax_bottom)
+    fig.get_layout_engine().set(hspace=0.05)
+    for i, ax_ in enumerate(axes):
+        lim = y_limits[n - 1 - i]
+        if lim is None:
+            raise ValueError(
+                f"y_limits[{n - 1 - i}] is None; all limits must be (min, max) tuples"
+            )
+        ax_.set_ylim(lim)
+
+    for i in range(n - 1):
+        _draw_axis_break(axes[i], axes[i + 1])
+
+    return fig, tuple(axes)
 
 
 def get_x_levels(data: pd.DataFrame, x: str) -> list:
@@ -95,7 +111,6 @@ def get_x_levels(data: pd.DataFrame, x: str) -> list:
 
 
 def add_legend(
-    fig: plt.Figure,
     ax: matplotlib.axes.Axes,
     styles: dict,
     hue_levels: list,
@@ -107,7 +122,6 @@ def add_legend(
     Add a legend to the figure below the x-axis label.
 
     Parameters:
-        fig (plt.Figure): The figure to add legend.
         ax (matplotlib.axes.Axes): The main (bottom) axes.
         styles (dict): A dictionary of styles for each hue level.
         hue_levels (list): A list of hue levels.
@@ -140,17 +154,21 @@ def add_legend(
         bbox_to_anchor=bbox_to_anchor,
         ncol=ncol,
     )
-    fig.tight_layout()
 
 
 def _draw_axis_break(ax_top, ax_bottom, d=0.5, **kwargs):
     """
-    Draw a broken axis between two axes.
+    Draw diagonal break markers between two adjacent axes.
+
+    Adds a pair of diagonal slash markers — one at the bottom edge of ax_top
+    and one at the top edge of ax_bottom — to visually indicate a discontinuity
+    in the Y axis.
 
     Parameters:
-        ax_top(matplotlib.axes.Axes): The top axis.
-        ax_bottom(matplotlib.axes.Axes): The bottom axis.
-        d(float): The distance from the top axis to the bottom.
+        ax_top(matplotlib.axes.Axes): The upper axis.
+        ax_bottom(matplotlib.axes.Axes): The lower axis.
+        d(float): Controls the slope of the diagonal marker. Larger values
+            produce a steeper slash. Defaults to 0.5.
         **kwargs: Additional keyword arguments to override default marker properties.
                   Common options include: color, markersize, markeredgewidth (mew), etc.
 
