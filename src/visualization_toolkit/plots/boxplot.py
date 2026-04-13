@@ -60,7 +60,7 @@ def boxplot(
         styles (dict, optional): Dictionary of styles for different hue levels,
                                  passed to ax.boxplot.
         y_limits (Sequence[Tuple[float, float]], optional): Y-axis limits ordered
-                            bottom-to-top. One tuple → single axis; two or more tuples →
+                            bottom-to-top. One tuple - single axis; two or more tuples -
                             broken axis with one break per adjacent pair.
         x_label (str, optional): Label for the X-axis.
         y_label (str, optional): Label for the Y-axis.

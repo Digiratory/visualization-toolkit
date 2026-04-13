@@ -48,8 +48,8 @@ def create_axes(
 
     Parameters:
         y_limits (Sequence): Sequence of (min, max) pairs ordered bottom-to-top.
-            One pair → single axis with that ylim.
-            Two or more pairs → broken axis with one break per adjacent pair.
+            One pair - single axis with that ylim.
+            Two or more pairs - broken axis with one break per adjacent pair.
         height_ratios (tuple): Height ratios for the axes, ordered top-to-bottom
             (matching matplotlib's gridspec convention). Must have the same length
             as y_limits when a broken axis is used; otherwise equal ratios are used.
