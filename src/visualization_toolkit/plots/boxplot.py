@@ -96,7 +96,9 @@ def boxplot(
         styles = {}
     if (significance_fn is not None) and (is_broken(y_limits)):
         raise NotImplementedError(
-            "Significance levels are not supported with broken axis"
+            "Significance annotations are not supported when using a broken y-axis "
+            "because bracket/label placement can be ambiguous across split panels. "
+            "Workaround: disable significance_fn or use a single, non-broken y-axis."
         )
 
     fig, axes = create_axes(
