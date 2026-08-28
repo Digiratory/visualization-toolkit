@@ -24,7 +24,7 @@ def boxplot(
     y_limits: Sequence[Tuple[float, float]] | None = None,
     significance_fn: Callable | None = None,
     significance_levels: dict[float, str] | None = None,
-    logy: bool = True,
+    logy: bool = False,
     x_label: str | None = None,
     y_label: str | None = None,
     title: str | None = None,
