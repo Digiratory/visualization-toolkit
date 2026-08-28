@@ -186,20 +186,33 @@ def plot_box_on_axis(
     Plot boxplots on a given axis.
 
     Parameters
-        data (pd.DataFrame): Input data containing experimental values.
-        x (str): Column name used as the categorical X-axis.
-        y (str): Column name with values to plot as boxplots.
-        hue (str or None): Column name for additional grouping within X categories.
-        hue_levels (list): Unique values of the hue variable.
-        base_positions (array-like): Positions for each X category on the X-axis.
-        x_levels (array-like): Unique values of the X variable.
-        styles (dict): Dictionary of styles for each hue value, passed to ax.boxplot.
-        ax (matplotlib.axes.Axes): Axis object on which to draw the boxplots.
-        show_median_text (bool): If True, show the median value above the box.
-        show_mean_text (bool): If True, show the mean value above the box.
-            If both show_median_text and show_mean_text are True, labels are stacked:
-            median on top, mean below.
-        median_mean_fontsize (int): Font size for the median/mean labels.
+    ----------
+    data : pd.DataFrame
+        Input data containing experimental values.
+    x : str
+        Column name used as the categorical X-axis.
+    y : str
+        Column name with values to plot as boxplots.
+    hue : str | None
+        Column name for additional grouping within X categories.
+    hue_levels : list
+        Unique values of the hue variable.
+    base_positions : array-like
+        Positions for each X category on the X-axis.
+    x_levels : array-like
+        Unique values of the X variable.
+    styles : dict
+        Dictionary of styles for each hue value, passed to ax.boxplot.
+    ax : matplotlib.axes.Axes
+        Axis object on which to draw the boxplots.
+    show_median_text : bool, default=False
+        If True, show the median value above the box.
+    show_mean_text : bool, default=False
+        If True, show the mean value above the box.
+        If both show_median_text and show_mean_text are True, labels are stacked:
+        median on top, mean below.
+    median_mean_fontsize : int, default=10
+        Font size for the median/mean labels.
     """
     n_hue = len(hue_levels)
     width = 0.8 / max(1, n_hue)
